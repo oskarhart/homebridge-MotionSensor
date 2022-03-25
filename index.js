@@ -23,6 +23,7 @@ function HttpMotion(log, config) {
    this.serial = config["serial"] || "Non-defined serial";
    this.timeout = DEF_TIMEOUT;
    this.json_response = config["json_response"] || "";
+   this.fieldName = ( config["field_name"] != null ? config["field_name"] : "temperature" );
    this.update_interval = Number( config["update_interval"] || DEF_INTERVAL );
 
    // Internal variables
@@ -55,7 +56,8 @@ HttpMotion.prototype = {
             this.log('HTTP successful response: ' + body);
          } else {
             try {
-               value = JSON.parse(body)[this.json_response];
+               value = this.fieldName === '' ? body : this.getFromObject(JSON.parse(body), this.fieldName, '');
+                  value = Number(value);
                this.log('HTTP successful response: ' + body);
             } catch (parseErr) {
                this.log('Error processing received information: ' + parseErr.message);
